@@ -19,13 +19,46 @@ The VARL Trading Application is a robust application built with Spring Boot vers
 
 - **Register**:
     - `POST http://localhost:8080/api/auth/register`
+    - {
+      "firstName": "Edwin",
+      "lastName": "Magodi",
+      "password": "Password@123",
+      "dateOfBirth": "1991-12-19",
+      "residentialCountry": "SA",
+      "identityIssuingCountry": "ZW",
+      "identityType": "Passport",
+      "identityNumber": "A123456789",
+      "identityExpiryDate": "2030-01-01",
+      "cellNumber": "+1234567890",
+      "email": "magodiedwin@gmail.com",
+      "purpose": "TRADING",
+      "employmentStatus": "EMPLOYED_PART_TIME",
+      "sourceOfFunds": "ALLOWANCE",
+      "role": "USER"
+      }
 - **Login**:
     - `POST http://localhost:8080/api/auth/login`
+    - {
+      "email": "magodiedwin@gmail.com",
+      "password": "Password@123"
+      }
 
 ### Orders
 
 - **Create Limit Order**:
     - `POST http://localhost:8080/api/orders/limit`
+    - {
+      "side": "SELL",
+      "quantity": 4.0,
+      "price": 200.0,
+      "pair": "BTCZAR",
+      "customerOrderId": "0002",
+      "timeInForce": "GTC",
+      "postOnly": false,
+      "allowMargin": false,
+      "reduceOnly": false,
+      "status": "PLACED"
+      }
 - **Get All Orders**:
     - `GET http://localhost:8080/api/orders`
 - **Get Order by ID**:
