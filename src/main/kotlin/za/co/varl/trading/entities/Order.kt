@@ -1,0 +1,16 @@
+package za.co.varl.trading.entities
+
+import za.co.varl.trading.enums.OrderStatus
+import za.co.varl.trading.enums.Side
+import za.co.varl.trading.enums.TimeInForce
+
+data class Order(
+    val id: String,
+    val side: Side, // "BUY" or "SELL"
+    var quantity: Double,
+    val price: Double,
+    val pair: String,
+    val customerOrderId: String?,
+    val timeInForce: TimeInForce, // e.g., "GTC", "FOK", "IOC"
+    var status: OrderStatus = OrderStatus.PLACED // Default status
+)
