@@ -1,2 +1,66 @@
-# trading
+# VARL TRADING APPLICATION
 In-memory order book to place a limit order with order matching including the ability to view all open orders
+
+## Overview
+
+The VARL Trading Application is a robust application built with Spring Boot version 3.4.2 and Vert.x, utilizing Kotlin. It features an in-memory order book for placing limit orders, real-time order matching, and the ability to view all open orders. The application employs role-based authentication using JWT for secure access.
+
+## Features
+
+- **In-memory Order Book**: Efficiently place and manage limit orders.
+- **Order Matching**: Real-time matching of buy and sell orders.
+- **View Open Orders**: Users can view all currently open orders.
+- **Role-Based Authentication**: Secure access using JWT.
+- **API Rate Limiting**: Limit the number of requests to enhance performance.
+
+## Endpoints
+
+### Authentication
+
+- **Register**:
+    - `POST /api/auth/register`
+- **Login**:
+    - `POST /api/auth/login`
+
+### Orders
+
+- **Create Limit Order**:
+    - `POST /api/orders/limit`
+- **Get All Orders**:
+    - `GET /api/orders`
+- **Get Order by ID**:
+    - `GET /api/orders/:id`
+- **Get Order Book**:
+    - `GET /:pair/orderbook`
+- **Get Recent Trades**:
+    - `GET /:pair/tradehistory`
+- **Get Open Orders** (Restricted to ADMIN):
+    - `GET /:pair/openorders`
+- **Get Open Orders by Customer ID**:
+    - `GET /customerOrderId/:customerOrderId/openorders`
+
+## Getting Started
+
+### Prerequisites
+
+- Kotlin 1.9.25
+- Java 17
+- Maven
+- Docker
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/emagodi/trading.git
+   cd trading
+   
+2. Build the project:
+    ```bash
+    mvn clean package
+    docker-compose up --build
+
+### DataLoader
+- JavaFaker
+- Automatically create 100 fake users for testing
+- Automatically create 100 orders and match to easily view trade history and order book
