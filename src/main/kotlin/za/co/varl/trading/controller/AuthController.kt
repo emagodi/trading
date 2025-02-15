@@ -1,0 +1,58 @@
+package za.co.varl.trading.controller
+
+import io.vertx.ext.web.Router
+import io.vertx.ext.web.RoutingContext
+import za.co.varl.trading.payload.request.LoginRequest
+import za.co.varl.trading.payload.request.RegisterRequest
+import za.co.varl.trading.payload.response.AuthenticationResponse
+import za.co.varl.trading.service.AuthService
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import za.co.varl.trading.config.JwtUtil
+
+class AuthController(private val authService: AuthService, private val jwtUtil: JwtUtil) {
+
+    private val objectMapper = ObjectMapper()
+        .registerModule(KotlinModule())
+        .registerModule(JavaTimeModule())
+
+    fun setupRoutes(router: Router) {
+        router.post("/api/auth/register").handler(this::register)
+        router.post("/api/auth/login").handler(this::login)
+    }
+
+    private fun register(ctx: RoutingContext) {
+        try {
+            val request = ctx.body().asJsonObject().mapTo(RegisterRequest::class.java)
+            val response: AuthenticationResponse = authService.registerUser(request)
+
+            ctx.response()
+                .setStatusCode(201) // HTTP 201 Created
+                .putHeader("Content-Type", "application/json")
+                .end(objectMapper.writeValueAsString(response))
+        } catch (e: Exception) {
+            ctx.response()
+                .setStatusCode(400) // Bad Request
+                .putHeader("Content-Type", "application/json")
+                .end(objectMapper.writeValueAsString(mapOf("error" to e.message)))
+        }
+    }
+
+    private fun login(ctx: RoutingContext) {
+        try {
+            val request = ctx.body().asJsonObject().mapTo(LoginRequest::class.java)
+            val response: AuthenticationResponse = authService.authenticateUser(request.email, request.password)
+
+            ctx.response()
+                .setStatusCode(200) // HTTP 200 OK
+                .putHeader("Content-Type", "application/json")
+                .end(objectMapper.writeValueAsString(response))
+        } catch (e: Exception) {
+            ctx.response()
+                .setStatusCode(401) // HTTP 401 Unauthorized
+                .putHeader("Content-Type", "application/json")
+                .end(objectMapper.writeValueAsString(mapOf("error" to e.message)))
+        }
+    }
+}
