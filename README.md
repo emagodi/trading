@@ -64,3 +64,13 @@ The VARL Trading Application is a robust application built with Spring Boot vers
 - JavaFaker
 - Automatically create 100 fake users for testing
 - Automatically create 100 orders and match to easily view trade history and order book
+
+### Caching
+- In order to improve the latency of requests, all GET requests for orders are cached by default.
+- I used the HTTP Cache-Control Header, which comprises one or more comma separated directives. These directives determine whether a GET response is cachable, and if so, the duration.
+
+### Rate Limiting
+- There is an API call limit of 5 API calls per minute per API key just for testing, beyond which the API calls will fail with a 429 Too Many Requests response. 
+- A response header of X-RateLimit-Limit	5, 
+- A response header of X-RateLimit-Remaining	4
+- A response header of X-RateLimit-Reset	1739626766791 (Unix exact time for reset)
