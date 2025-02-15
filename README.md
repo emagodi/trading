@@ -18,26 +18,26 @@ The VARL Trading Application is a robust application built with Spring Boot vers
 ### Authentication
 
 - **Register**:
-    - `POST /api/auth/register`
+    - `POST http://localhost:8080/api/auth/register`
 - **Login**:
-    - `POST /api/auth/login`
+    - `POST http://localhost:8080/api/auth/login`
 
 ### Orders
 
 - **Create Limit Order**:
-    - `POST /api/orders/limit`
+    - `POST http://localhost:8080/api/orders/limit`
 - **Get All Orders**:
-    - `GET /api/orders`
+    - `GET http://localhost:8080/api/orders`
 - **Get Order by ID**:
-    - `GET /api/orders/:id`
+    - `GET http://localhost:8080/api/orders/:id`
 - **Get Order Book**:
-    - `GET /:pair/orderbook`
+    - `GET http://localhost:8080/:pair/orderbook`
 - **Get Recent Trades**:
-    - `GET /:pair/tradehistory`
+    - `GET http://localhost:8080/:pair/tradehistory`
 - **Get Open Orders** (Restricted to ADMIN):
-    - `GET /:pair/openorders`
+    - `GET http://localhost:8080/:pair/openorders`
 - **Get Open Orders by Customer ID**:
-    - `GET /customerOrderId/:customerOrderId/openorders`
+    - `GET http://localhost:8080/customerOrderId/:customerOrderId/openorders`
 
 ## Getting Started
 
