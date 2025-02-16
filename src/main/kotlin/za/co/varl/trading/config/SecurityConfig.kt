@@ -20,7 +20,7 @@ class SecurityConfig {
             .authorizeHttpRequests { requests ->
                 requests
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/webjars/**").permitAll() // Allow Swagger UI
-                    .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/users").permitAll() // Allow access to register and login
+                    .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/users", "/api/auth/changepassword").permitAll() // Allow access to register and login
                     .anyRequest().authenticated() // Require authentication for all other requests
             }
 
