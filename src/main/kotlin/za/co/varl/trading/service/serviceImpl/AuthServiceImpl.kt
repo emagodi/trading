@@ -1,4 +1,4 @@
-package za.co.varl.trading.service
+package za.co.varl.trading.service.serviceImpl
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -8,6 +8,8 @@ import za.co.varl.trading.payload.response.AuthenticationResponse
 import za.co.varl.trading.entities.User
 import za.co.varl.trading.payload.request.ChangePasswordRequest
 import za.co.varl.trading.repository.UserRepository
+import za.co.varl.trading.service.AuthService
+import za.co.varl.trading.enums.Role // Ensure this import is present
 import java.util.Date
 
 @Service
@@ -20,10 +22,11 @@ class AuthServiceImpl(private val userRepository: UserRepository) : AuthService 
             throw Exception("User already exists")
         }
 
+        val userRole = Role.valueOf(request.role.name) // Convert string to Role enum
         val user = User(
             id = generateUserId(),
             password = hashPassword(request.password),
-            role = request.role, // Single role
+            role = userRole, // Store as Role enum
             firstName = request.firstName,
             lastName = request.lastName,
             dateOfBirth = request.dateOfBirth,
@@ -58,7 +61,7 @@ class AuthServiceImpl(private val userRepository: UserRepository) : AuthService 
             purpose = user.purpose.toString(),
             employmentStatus = user.employmentStatus.toString(),
             sourceOfFunds = user.sourceOfFunds.toString(),
-            role = user.role // Single role
+            role = user.role // Convert Role enum to string for response
         )
     }
 
@@ -83,7 +86,7 @@ class AuthServiceImpl(private val userRepository: UserRepository) : AuthService 
                 purpose = user.purpose.toString(),
                 employmentStatus = user.employmentStatus.toString(),
                 sourceOfFunds = user.sourceOfFunds.toString(),
-                role = user.role // Single role
+                role = user.role // Convert Role enum to string for response
             )
         } else {
             throw Exception("Invalid email or password")
@@ -93,7 +96,8 @@ class AuthServiceImpl(private val userRepository: UserRepository) : AuthService 
     private fun generateToken(user: User): String {
         return Jwts.builder()
             .setSubject(user.email) // Subject is set to the user's email
-            .claim("role", user.role) // Include single role
+            .claim("role", user.role.name) // Include role as string
+            .claim("permissions", user.role.permissions.map { it.name }) // Include permissions
             .claim("email", user.email) // Include email in the claims
             .setIssuedAt(Date())
             .setExpiration(Date(System.currentTimeMillis() + 86400000)) // 1 day expiration
@@ -115,22 +119,18 @@ class AuthServiceImpl(private val userRepository: UserRepository) : AuthService 
         return inputPassword == storedPassword // Replace with actual verification
     }
 
-
     override fun changePassword(email: String, request: ChangePasswordRequest): String {
         val user = userRepository.findByEmail(email) ?: throw Exception("User not found")
 
         // Verify the current password
-        if (request.currentPassword != user.password) {
+        if (!verifyPassword(request.currentPassword, user.password)) {
             throw Exception("Current password is incorrect")
         }
 
         // Optionally validate new password here (length, complexity, etc.)
-        user.password = request.newPassword // Update to the new password
+        user.password = hashPassword(request.newPassword) // Update to the new password
         userRepository.save(user)
 
         return "Password changed successfully"
     }
-
-
-
 }
