@@ -12,7 +12,7 @@ import za.co.varl.trading.enums.Role
 import za.co.varl.trading.payload.request.RegisterRequest
 import za.co.varl.trading.payload.response.AuthenticationResponse
 import za.co.varl.trading.repository.UserRepository
-import za.co.varl.trading.service.AuthServiceImpl
+import za.co.varl.trading.service.serviceImpl.AuthServiceImpl
 
 class AuthServiceImplTest {
 
