@@ -3,19 +3,21 @@ package za.co.varl.trading.config
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import za.co.varl.trading.enums.Role
 import java.util.Date
 import java.util.UUID
 
 class JwtUtil(private val secretKey: String) {
 
-    fun generateToken(username: String, role: String, email: String): String {
+    fun generateToken(username: String, role: Role, email: String): String {
         return Jwts.builder()
             .setSubject(username)
-            .claim("role", role) // Include single role
-            .claim("email", email) // Include email in the claims
+            .claim("role", role.name) // Store role as a string
+            .claim("permissions", role.permissions.map { it.name }) // Include permissions
+            .claim("email", email)
             .setId(UUID.randomUUID().toString())
             .setIssuedAt(Date())
-            .setExpiration(Date(System.currentTimeMillis() + 86400000)) // 1 day expiration
+            .setExpiration(Date(System.currentTimeMillis() + 86400000))
             .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact()
     }
@@ -47,4 +49,10 @@ class JwtUtil(private val secretKey: String) {
         val expiration: Date = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.expiration
         return expiration.before(Date())
     }
+
+    fun extractPermissions(token: String): List<String> {
+        val claims: Claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body
+        return claims["permissions"] as List<String>? ?: emptyList()
+    }
+
 }
