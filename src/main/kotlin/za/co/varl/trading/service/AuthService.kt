@@ -1,5 +1,6 @@
 package za.co.varl.trading.service
 
+import za.co.varl.trading.payload.request.ChangePasswordRequest
 import za.co.varl.trading.payload.request.RegisterRequest
 import za.co.varl.trading.payload.response.AuthenticationResponse
 
@@ -7,5 +8,6 @@ import za.co.varl.trading.payload.response.AuthenticationResponse
 interface AuthService {
     fun registerUser(request: RegisterRequest): AuthenticationResponse
     fun authenticateUser(email: String, password: String): AuthenticationResponse
+    fun changePassword(email: String, request: ChangePasswordRequest): String
 
 }
