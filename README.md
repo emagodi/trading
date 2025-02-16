@@ -12,6 +12,7 @@ The VARL Trading Application is a robust application built with Spring Boot vers
 - **View Open Orders**: Users can view all currently open orders.
 - **Role-Based Authentication**: Secure access using JWT.
 - **API Rate Limiting**: Limit the number of requests to enhance performance.
+- **API have scoped permissions: View access, Trade, Withdraw and Transfer
 
 ## Endpoints
 
