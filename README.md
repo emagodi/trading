@@ -42,6 +42,13 @@ The VARL Trading Application is a robust application built with Spring Boot vers
       "email": "magodiedwin@gmail.com",
       "password": "Password@123"
       }
+  
+- **Change Password**:
+    - `POST http://localhost:8080/api/auth/changepassword?email=magodiedwin@gmail.com`
+    - {
+      "currentPassword": "Password@123",
+      "newPassword": "Password@1234"
+      }
 
 ### Orders
 
