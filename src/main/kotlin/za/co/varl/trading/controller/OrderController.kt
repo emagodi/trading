@@ -14,12 +14,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import za.co.varl.trading.config.JwtUtil
 import za.co.varl.trading.entities.Trade
+import za.co.varl.trading.enums.Role // Import the Role enum
 
 class OrderController(
     private val orderService: OrderService,
     private val vertx: Vertx,
     private val jwtUtil: JwtUtil,
-    private val rateLimitService: RateLimitService // Inject RateLimitService
+    private val rateLimitService: RateLimitService
 ) {
 
     private val objectMapper = ObjectMapper()
@@ -39,7 +40,6 @@ class OrderController(
 
     private fun authenticate(ctx: RoutingContext) {
         val authHeader = ctx.request().getHeader("Authorization")
-
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             val token = authHeader.substring(7)
 
@@ -74,7 +74,9 @@ class OrderController(
                 ctx.response().putHeader("X-RateLimit-Remaining", rateLimitService.getRemainingRequests(email).toString())
                 ctx.response().putHeader("X-RateLimit-Reset", (System.currentTimeMillis() + 60000).toString()) // Reset time
 
+                // Store role and permissions in context
                 ctx.put("role", role)
+                ctx.put("permissions", jwtUtil.extractPermissions(token)) // New extraction for permissions
                 ctx.next() // Continue to the next handler
             } else {
                 ctx.response().setStatusCode(401).end("Invalid token")
@@ -85,9 +87,9 @@ class OrderController(
     }
 
     private fun createLimitOrder(ctx: RoutingContext) {
-        val role = ctx.get<String>("role")
-        if (role != "USER") {
-            ctx.response().setStatusCode(403).end("Access denied: Only users can create orders.")
+        val permissions = ctx.get<List<String>>("permissions")
+        if (!permissions.contains("TRADE")) {
+            ctx.response().setStatusCode(403).end("Access denied: You do not have permission to create orders.")
             return
         }
 
@@ -146,9 +148,9 @@ class OrderController(
     }
 
     private fun getOpenOrders(ctx: RoutingContext) {
-        val role = ctx.get<String>("role")
-        if (role != "ADMIN") {
-            ctx.response().setStatusCode(403).end("Access denied: Only admins can access open orders.")
+        val permissions = ctx.get<List<String>>("permissions")
+        if (!permissions.contains("VIEW")) {
+            ctx.response().setStatusCode(403).end("Access denied: You do not have permission to view open orders.")
             return
         }
 
