@@ -2,6 +2,7 @@ package za.co.varl.trading.controller
 
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
+import za.co.varl.trading.payload.request.ChangePasswordRequest
 import za.co.varl.trading.payload.request.LoginRequest
 import za.co.varl.trading.payload.request.RegisterRequest
 import za.co.varl.trading.payload.response.AuthenticationResponse
@@ -20,6 +21,7 @@ class AuthController(private val authService: AuthService, private val jwtUtil: 
     fun setupRoutes(router: Router) {
         router.post("/api/auth/register").handler(this::register)
         router.post("/api/auth/login").handler(this::login)
+        router.post("/api/auth/changepassword").handler(this::changePassword)
     }
 
     private fun register(ctx: RoutingContext) {
@@ -51,6 +53,24 @@ class AuthController(private val authService: AuthService, private val jwtUtil: 
         } catch (e: Exception) {
             ctx.response()
                 .setStatusCode(401) // HTTP 401 Unauthorized
+                .putHeader("Content-Type", "application/json")
+                .end(objectMapper.writeValueAsString(mapOf("error" to e.message)))
+        }
+    }
+
+    private fun changePassword(ctx: RoutingContext) {
+        try {
+            val request = ctx.body().asJsonObject().mapTo(ChangePasswordRequest::class.java)
+            val email = ctx.request().getParam("email") // Get email from the request parameters
+            val responseMessage = authService.changePassword(email, request)
+
+            ctx.response()
+                .setStatusCode(200) // HTTP 200 OK
+                .putHeader("Content-Type", "application/json")
+                .end(objectMapper.writeValueAsString(mapOf("message" to responseMessage)))
+        } catch (e: Exception) {
+            ctx.response()
+                .setStatusCode(400) // Bad Request
                 .putHeader("Content-Type", "application/json")
                 .end(objectMapper.writeValueAsString(mapOf("error" to e.message)))
         }
