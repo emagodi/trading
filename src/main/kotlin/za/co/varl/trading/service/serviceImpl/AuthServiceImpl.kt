@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import za.co.varl.trading.payload.request.RegisterRequest
 import za.co.varl.trading.payload.response.AuthenticationResponse
 import za.co.varl.trading.entities.User
+import za.co.varl.trading.payload.request.ChangePasswordRequest
 import za.co.varl.trading.repository.UserRepository
 import java.util.Date
 
@@ -113,4 +114,23 @@ class AuthServiceImpl(private val userRepository: UserRepository) : AuthService 
         // Implement password verification logic
         return inputPassword == storedPassword // Replace with actual verification
     }
+
+
+    override fun changePassword(email: String, request: ChangePasswordRequest): String {
+        val user = userRepository.findByEmail(email) ?: throw Exception("User not found")
+
+        // Verify the current password
+        if (request.currentPassword != user.password) {
+            throw Exception("Current password is incorrect")
+        }
+
+        // Optionally validate new password here (length, complexity, etc.)
+        user.password = request.newPassword // Update to the new password
+        userRepository.save(user)
+
+        return "Password changed successfully"
+    }
+
+
+
 }
