@@ -7,7 +7,7 @@ import za.co.varl.trading.enums.SourceOfFunds
 
 data class User(
     val id: Long,  // Ensure this property exists
-    val password: String,
+    var password: String,
     val role: Role,
     val firstName: String,
     val lastName: String,
