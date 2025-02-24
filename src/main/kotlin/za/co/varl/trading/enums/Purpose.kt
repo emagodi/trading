@@ -4,4 +4,6 @@ enum class Purpose {
 
     TRADING,
 
+    FUNDING
+
 }
