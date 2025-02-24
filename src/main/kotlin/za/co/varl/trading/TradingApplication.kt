@@ -15,14 +15,25 @@ import za.co.varl.trading.controller.OrderController
 import za.co.varl.trading.service.AuthService
 import za.co.varl.trading.service.OrderService
 import za.co.varl.trading.service.RateLimitService
+import za.co.varl.trading.service.EmailService
 
 @SpringBootApplication
 @EnableCaching // Enable caching in the Spring application
 class TradingApplication {
 
 	@Bean
-	fun vertxRouter(authService: AuthService, orderService: OrderService, rateLimitService: RateLimitService): Router {
-		val vertx = Vertx.vertx()
+	fun vertx(): Vertx {
+		return Vertx.vertx() // Create a Vertx instance as a bean
+	}
+
+	@Bean
+	fun vertxRouter(
+		authService: AuthService,
+		orderService: OrderService,
+		rateLimitService: RateLimitService,
+		emailService: EmailService // Inject EmailService
+	): Router {
+		val vertx = vertx() // Get the Vertx instance
 		val router = Router.router(vertx)
 
 		// Create an instance of JwtUtil
@@ -35,8 +46,8 @@ class TradingApplication {
 		val authController = AuthController(authService, jwtUtil)
 		authController.setupRoutes(router)
 
-		// Set up the OrderController routes
-		val orderController = OrderController(orderService, vertx, jwtUtil, rateLimitService) // Pass rateLimitService
+		// Set up the OrderController routes, passing emailService
+		val orderController = OrderController(orderService, vertx, jwtUtil, rateLimitService, emailService)
 		orderController.setupRoutes(router)
 
 		// Start the Vert.x HTTP server
