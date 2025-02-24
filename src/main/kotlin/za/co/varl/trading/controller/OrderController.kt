@@ -9,22 +9,23 @@ import za.co.varl.trading.entities.OrderBook
 import za.co.varl.trading.payload.request.CreateOrderRequest
 import za.co.varl.trading.service.OrderService
 import za.co.varl.trading.service.RateLimitService
+import za.co.varl.trading.service.EmailService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import za.co.varl.trading.config.JwtUtil
 import za.co.varl.trading.entities.Trade
-import za.co.varl.trading.enums.Role // Import the Role enum
 
 class OrderController(
     private val orderService: OrderService,
     private val vertx: Vertx,
     private val jwtUtil: JwtUtil,
-    private val rateLimitService: RateLimitService
+    private val rateLimitService: RateLimitService,
+    private val emailService: EmailService // Inject EmailService
 ) {
 
     private val objectMapper = ObjectMapper()
-        .registerModule(KotlinModule())
+        .registerModule(KotlinModule.Builder().build())
         .registerModule(JavaTimeModule())
 
     fun setupRoutes(router: Router) {
@@ -63,6 +64,9 @@ class OrderController(
                     return
                 }
 
+                // Store email in context for later use
+                ctx.put("email", email)
+
                 // Check rate limit here
                 if (rateLimitService.isRateLimited(email)) {
                     ctx.response().setStatusCode(429).end("Too Many Requests")
@@ -97,6 +101,14 @@ class OrderController(
             val request = ctx.body().asJsonObject().mapTo(CreateOrderRequest::class.java)
             val order: Order = orderService.createLimitOrder(request)
             orderService.matchOrders(order.pair)
+
+            // Retrieve the email from the context
+            val email = ctx.get<String>("email") ?: "default@example.com" // Fallback if email is not present
+
+            // Prepare order details for email notification
+            val orderDetails = "Order ID: ${order.id}, Side: ${order.side}, Quantity: ${order.quantity}, Price: ${order.price}, Pair: ${order.pair}"
+            emailService.sendOrderNotification(email, orderDetails) // Use the email from the context
+
             ctx.response()
                 .setStatusCode(201)
                 .end(objectMapper.writeValueAsString(order))
