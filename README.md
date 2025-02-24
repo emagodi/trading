@@ -115,3 +115,7 @@ The VARL Trading Application is a robust application built with Spring Boot vers
 - A response header of X-RateLimit-Limit	5, 
 - A response header of X-RateLimit-Remaining	4
 - A response header of X-RateLimit-Reset	1739626766791 (Unix exact time for reset)
+
+### Email Notification
+- Asynchronous event driven approach is used to send email when order is created
+- Email is extracted from the authenticated user using jwt
