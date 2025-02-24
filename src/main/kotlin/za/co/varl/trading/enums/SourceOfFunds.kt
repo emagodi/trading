@@ -4,7 +4,9 @@ enum class SourceOfFunds {
 
     ALLOWANCE,
 
+    SALARY,
 
+    PENSION
 
 
 }
