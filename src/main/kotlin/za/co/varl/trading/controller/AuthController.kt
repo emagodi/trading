@@ -15,7 +15,7 @@ import za.co.varl.trading.config.JwtUtil
 class AuthController(private val authService: AuthService, private val jwtUtil: JwtUtil) {
 
     private val objectMapper = ObjectMapper()
-        .registerModule(KotlinModule())
+        .registerModule(KotlinModule.Builder().build())
         .registerModule(JavaTimeModule())
 
     fun setupRoutes(router: Router) {
