@@ -8,6 +8,7 @@ import za.co.varl.trading.enums.OrderStatus
 import za.co.varl.trading.enums.Side
 import za.co.varl.trading.enums.TimeInForce
 import za.co.varl.trading.payload.request.CreateOrderRequest
+import za.co.varl.trading.payload.request.UpdateOrderRequest
 import za.co.varl.trading.repository.OrderRepository
 import za.co.varl.trading.service.serviceImpl.OrderServiceImpl
 import java.util.UUID
@@ -182,4 +183,71 @@ class OrderServiceImplTest {
         // Assert
         assertEquals(expectedOrders, actualOrders)
     }
+
+
+    @Test
+    fun `test modifyOrder cancels order if new total quantity is less than filled`() {
+        // Arrange
+        val orderId = UUID.randomUUID().toString()
+        val existingOrder = Order(
+            id = orderId,
+            side = Side.BUY,
+            quantity = 10.0,
+            price = 100.0,
+            pair = "BTC/USD",
+            customerOrderId = "cust123",
+            timeInForce = TimeInForce.GTC
+        )
+        whenever(orderRepository.findById(orderId)).thenReturn(existingOrder)
+
+        val updateRequest = UpdateOrderRequest(
+            newRemainingQuantity = null,
+            newTotalQuantity = 5.0, // New total quantity is less than filled
+            newPrice = null,
+            customerOrderId = "cust123",
+            modifyMatchStrategy = "CANCEL_ORIGINAL"
+        )
+
+        // Act
+        val modifiedOrder = orderService.modifyOrder(orderId, updateRequest)
+
+        // Assert
+        assertNull(modifiedOrder) // Order should be cancelled
+        verify(orderRepository).deleteById(orderId) // Ensure delete was called
+    }
+
+    @Test
+    fun `test modifyOrder updates order successfully`() {
+        // Arrange
+        val orderId = UUID.randomUUID().toString()
+        val existingOrder = Order(
+            id = orderId,
+            side = Side.BUY,
+            quantity = 10.0,
+            price = 100.0,
+            pair = "BTC/USD",
+            customerOrderId = "cust123",
+            timeInForce = TimeInForce.GTC
+        )
+        whenever(orderRepository.findById(orderId)).thenReturn(existingOrder)
+
+        val updateRequest = UpdateOrderRequest(
+            newRemainingQuantity = 5.0,
+            newTotalQuantity = 10.0,
+            newPrice = 95.0,
+            customerOrderId = "cust123",
+            modifyMatchStrategy = "RETAIN_ORIGINAL"
+        )
+
+        // Act
+        val modifiedOrder = orderService.modifyOrder(orderId, updateRequest)
+
+        // Assert
+        assertEquals(10.0, modifiedOrder?.quantity) // Verify quantity is updated
+        assertEquals(95.0, modifiedOrder?.price) // Verify price is updated
+        if (modifiedOrder != null) {
+            verify(orderRepository).save(modifiedOrder)
+        } // Ensure save was called
+    }
+
 }
