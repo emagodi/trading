@@ -22,7 +22,7 @@ class OrderController(
     private val vertx: Vertx,
     private val jwtUtil: JwtUtil,
     private val rateLimitService: RateLimitService,
-    private val emailService: EmailService // Inject EmailService
+    private val emailService: EmailService
 ) {
 
     private val objectMapper = ObjectMapper()
@@ -36,7 +36,7 @@ class OrderController(
         router.get("/api/orders/:id").handler(this::authenticate).handler(this::getOrderById)
         router.get("/:pair/orderbook").handler(this::authenticate).handler(this::getOrderBook)
         router.get("/:pair/tradehistory").handler(this::authenticate).handler(this::getRecentTrades)
-        router.get("/:pair/openorders").handler(this::authenticate).handler(this::getOpenOrders) // Restricted to ADMIN
+        router.get("/:pair/openorders").handler(this::authenticate).handler(this::getOpenOrders)
         router.get("/customerOrderId/:customerOrderId/openorders").handler(this::authenticate).handler(this::getOpenOrdersByCustomerId)
         router.put("/api/orders/modify/:id").handler(this::authenticate).handler(this::modifyOrder)
     }
@@ -66,24 +66,24 @@ class OrderController(
                     return
                 }
 
-                // Store email in context for later use
+
                 ctx.put("email", email)
 
-                // Check rate limit here
+
                 if (rateLimitService.isRateLimited(email)) {
                     ctx.response().setStatusCode(429).end("Too Many Requests")
                     return
                 }
 
-                // Add rate limit headers
-                ctx.response().putHeader("X-RateLimit-Limit", "5") // Max requests
-                ctx.response().putHeader("X-RateLimit-Remaining", rateLimitService.getRemainingRequests(email).toString())
-                ctx.response().putHeader("X-RateLimit-Reset", (System.currentTimeMillis() + 60000).toString()) // Reset time
 
-                // Store role and permissions in context
+                ctx.response().putHeader("X-RateLimit-Limit", "5")
+                ctx.response().putHeader("X-RateLimit-Remaining", rateLimitService.getRemainingRequests(email).toString())
+                ctx.response().putHeader("X-RateLimit-Reset", (System.currentTimeMillis() + 60000).toString())
+
+
                 ctx.put("role", role)
-                ctx.put("permissions", jwtUtil.extractPermissions(token)) // New extraction for permissions
-                ctx.next() // Continue to the next handler
+                ctx.put("permissions", jwtUtil.extractPermissions(token))
+                ctx.next()
             } else {
                 ctx.response().setStatusCode(401).end("Invalid token")
             }
@@ -104,12 +104,12 @@ class OrderController(
             val order: Order = orderService.createLimitOrder(request)
             orderService.matchOrders(order.pair)
 
-            // Retrieve the email from the context
-            val email = ctx.get<String>("email") ?: "default@example.com" // Fallback if email is not present
 
-            // Prepare order details for email notification
+            val email = ctx.get<String>("email") ?: "default@example.com"
+
+
             val orderDetails = "Order ID: ${order.id}, Side: ${order.side}, Quantity: ${order.quantity}, Price: ${order.price}, Pair: ${order.pair}"
-            emailService.sendOrderNotification(email, orderDetails) // Use the email from the context
+            emailService.sendOrderNotification(email, orderDetails)
 
             ctx.response()
                 .setStatusCode(201)
@@ -126,7 +126,7 @@ class OrderController(
         val orders: List<Order> = orderService.getAllOrders()
         ctx.response()
             .setStatusCode(200)
-            .putHeader("Cache-Control", "max-age=120, public") // Cache for 120 seconds
+            .putHeader("Cache-Control", "max-age=120, public")
             .end(objectMapper.writeValueAsString(orders))
     }
 
@@ -136,7 +136,7 @@ class OrderController(
         if (order != null) {
             ctx.response()
                 .setStatusCode(200)
-                .putHeader("Cache-Control", "max-age=60, public") // Cache for 60 seconds
+                .putHeader("Cache-Control", "max-age=60, public")
                 .end(objectMapper.writeValueAsString(order))
         } else {
             ctx.response().setStatusCode(404).end("Order not found")
@@ -148,7 +148,7 @@ class OrderController(
         val orderBook: OrderBook = orderService.getOrderBook(pair)
         ctx.response()
             .setStatusCode(200)
-            .putHeader("Cache-Control", "max-age=90, public") // Cache for 90 seconds
+            .putHeader("Cache-Control", "max-age=90, public")
             .end(objectMapper.writeValueAsString(orderBook))
     }
 
@@ -157,7 +157,7 @@ class OrderController(
         val trades: List<Trade> = orderService.getRecentTrades(pair)
         ctx.response()
             .setStatusCode(200)
-            .putHeader("Cache-Control", "max-age=120, public") // Cache for 120 seconds
+            .putHeader("Cache-Control", "max-age=120, public")
             .end(objectMapper.writeValueAsString(trades))
     }
 
@@ -174,7 +174,7 @@ class OrderController(
         if (openOrders.isNotEmpty()) {
             ctx.response()
                 .setStatusCode(200)
-                .putHeader("Cache-Control", "max-age=60, public") // Cache for 60 seconds
+                .putHeader("Cache-Control", "max-age=60, public")
                 .end(objectMapper.writeValueAsString(openOrders))
         } else {
             ctx.response().setStatusCode(404).end("No open orders found for the specified pair.")
@@ -188,7 +188,7 @@ class OrderController(
         if (openOrders.isNotEmpty()) {
             ctx.response()
                 .setStatusCode(200)
-                .putHeader("Cache-Control", "max-age=60, public") // Cache for 60 seconds
+                .putHeader("Cache-Control", "max-age=60, public")
                 .end(objectMapper.writeValueAsString(openOrders))
         } else {
             ctx.response().setStatusCode(404).end("No open orders found for the specified customer order ID.")
@@ -206,7 +206,7 @@ class OrderController(
             return
         }
 
-        // Rate limiting
+
         val email = ctx.get<String>("email") ?: return
         if (rateLimitService.isRateLimited(email)) {
             ctx.response().setStatusCode(429).end("Too Many Requests")
@@ -226,7 +226,7 @@ class OrderController(
             }
         } catch (e: Exception) {
             ctx.response()
-                .setStatusCode(400) // Bad Request
+                .setStatusCode(400)
                 .putHeader("Content-Type", "application/json")
                 .end(objectMapper.writeValueAsString(mapOf("error" to e.message)))
         }
