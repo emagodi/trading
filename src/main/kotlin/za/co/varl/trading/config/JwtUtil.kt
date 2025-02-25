@@ -52,7 +52,7 @@ class JwtUtil(private val secretKey: String) {
 
     fun extractPermissions(token: String): List<String> {
         val claims: Claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body
-        return claims["permissions"] as List<String>? ?: emptyList()
+        return (claims["permissions"] as? List<*>)?.filterIsInstance<String>() ?: emptyList()
     }
 
 }
