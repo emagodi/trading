@@ -12,7 +12,7 @@ class JwtUtil(private val secretKey: String) {
     fun generateToken(username: String, role: Role, email: String): String {
         return Jwts.builder()
             .setSubject(username)
-            .claim("role", role.name) // Store role as a string
+            .claim("role", role.name)
             .claim("permissions", role.permissions.map { it.name }) // Include permissions
             .claim("email", email)
             .setId(UUID.randomUUID().toString())
@@ -27,7 +27,7 @@ class JwtUtil(private val secretKey: String) {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
             true
         } catch (e: Exception) {
-            false // You might want to log the exception here
+            false
         }
     }
 
