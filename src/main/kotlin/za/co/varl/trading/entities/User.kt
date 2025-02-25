@@ -6,7 +6,7 @@ import za.co.varl.trading.enums.Role
 import za.co.varl.trading.enums.SourceOfFunds
 
 data class User(
-    val id: Long,  // Ensure this property exists
+    val id: Long,
     var password: String,
     val role: Role,
     val firstName: String,

@@ -6,11 +6,11 @@ import za.co.varl.trading.enums.TimeInForce
 
 data class Order(
     val id: String,
-    val side: Side, // "BUY" or "SELL"
+    val side: Side,
     var quantity: Double,
     var price: Double,
     val pair: String,
     val customerOrderId: String?,
-    val timeInForce: TimeInForce, // e.g., "GTC", "FOK", "IOC"
-    var status: OrderStatus = OrderStatus.PLACED // Default status
+    val timeInForce: TimeInForce,
+    var status: OrderStatus = OrderStatus.PLACED
 )
