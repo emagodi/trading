@@ -37,11 +37,6 @@ class OrderRepository {
         orders.remove(id)
     }
 
-    // Method to save multiple orders
-    fun saveAll(orders: List<Order>): List<Order> {
-        orders.forEach { save(it) }
-        return orders
-    }
 
     // Method to find orders by pair and side
     fun findByPair(pair: String, side: Side): List<Order> {
@@ -83,10 +78,6 @@ class OrderRepository {
     fun findOpenOrdersByCustomerId(customerOrderId: String): List<Order> {
         return orders.values.filter { it.customerOrderId == customerOrderId &&
                 (it.status == OrderStatus.PLACED || it.status == OrderStatus.ACTIVE || it.status == OrderStatus.PARTIALLY_FILLED) }
-    }
-
-    fun findByCustomerOrderId(customerOrderId: String): Order? {
-        return orders.values.find { it.customerOrderId == customerOrderId }
     }
 
 }
