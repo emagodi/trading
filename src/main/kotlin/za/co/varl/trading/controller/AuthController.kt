@@ -30,12 +30,12 @@ class AuthController(private val authService: AuthService, private val jwtUtil: 
             val response: AuthenticationResponse = authService.registerUser(request)
 
             ctx.response()
-                .setStatusCode(201) // HTTP 201 Created
+                .setStatusCode(201)
                 .putHeader("Content-Type", "application/json")
                 .end(objectMapper.writeValueAsString(response))
         } catch (e: Exception) {
             ctx.response()
-                .setStatusCode(400) // Bad Request
+                .setStatusCode(400)
                 .putHeader("Content-Type", "application/json")
                 .end(objectMapper.writeValueAsString(mapOf("error" to e.message)))
         }
@@ -47,12 +47,12 @@ class AuthController(private val authService: AuthService, private val jwtUtil: 
             val response: AuthenticationResponse = authService.authenticateUser(request.email, request.password)
 
             ctx.response()
-                .setStatusCode(200) // HTTP 200 OK
+                .setStatusCode(200)
                 .putHeader("Content-Type", "application/json")
                 .end(objectMapper.writeValueAsString(response))
         } catch (e: Exception) {
             ctx.response()
-                .setStatusCode(401) // HTTP 401 Unauthorized
+                .setStatusCode(401)
                 .putHeader("Content-Type", "application/json")
                 .end(objectMapper.writeValueAsString(mapOf("error" to e.message)))
         }
@@ -61,16 +61,16 @@ class AuthController(private val authService: AuthService, private val jwtUtil: 
     private fun changePassword(ctx: RoutingContext) {
         try {
             val request = ctx.body().asJsonObject().mapTo(ChangePasswordRequest::class.java)
-            val email = ctx.request().getParam("email") // Get email from the request parameters
+            val email = ctx.request().getParam("email")
             val responseMessage = authService.changePassword(email, request)
 
             ctx.response()
-                .setStatusCode(200) // HTTP 200 OK
+                .setStatusCode(200)
                 .putHeader("Content-Type", "application/json")
                 .end(objectMapper.writeValueAsString(mapOf("message" to responseMessage)))
         } catch (e: Exception) {
             ctx.response()
-                .setStatusCode(400) // Bad Request
+                .setStatusCode(400)
                 .putHeader("Content-Type", "application/json")
                 .end(objectMapper.writeValueAsString(mapOf("error" to e.message)))
         }
