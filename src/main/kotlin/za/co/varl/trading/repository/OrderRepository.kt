@@ -85,4 +85,8 @@ class OrderRepository {
                 (it.status == OrderStatus.PLACED || it.status == OrderStatus.ACTIVE || it.status == OrderStatus.PARTIALLY_FILLED) }
     }
 
+    fun findByCustomerOrderId(customerOrderId: String): Order? {
+        return orders.values.find { it.customerOrderId == customerOrderId }
+    }
+
 }
