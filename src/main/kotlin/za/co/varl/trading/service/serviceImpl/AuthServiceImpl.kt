@@ -2,6 +2,7 @@ package za.co.varl.trading.service.serviceImpl
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import za.co.varl.trading.payload.request.RegisterRequest
 import za.co.varl.trading.payload.response.AuthenticationResponse
@@ -9,13 +10,14 @@ import za.co.varl.trading.entities.User
 import za.co.varl.trading.payload.request.ChangePasswordRequest
 import za.co.varl.trading.repository.UserRepository
 import za.co.varl.trading.service.AuthService
-import za.co.varl.trading.enums.Role // Ensure this import is present
+import za.co.varl.trading.enums.Role
 import java.util.Date
 
 @Service
 class AuthServiceImpl(private val userRepository: UserRepository) : AuthService {
 
-    private val secretKey = "586B633834416E396D7436753879382F423F4428482B4C6250655367566B5970"
+    @Value("\${jwt.secret}")
+    private lateinit var secretKey: String
 
     override fun registerUser(request: RegisterRequest): AuthenticationResponse {
         if (userRepository.existsByEmail(request.email)) {
@@ -26,7 +28,7 @@ class AuthServiceImpl(private val userRepository: UserRepository) : AuthService 
         val user = User(
             id = generateUserId(),
             password = hashPassword(request.password),
-            role = userRole, // Store as Role enum
+            role = userRole,
             firstName = request.firstName,
             lastName = request.lastName,
             dateOfBirth = request.dateOfBirth,
@@ -100,7 +102,7 @@ class AuthServiceImpl(private val userRepository: UserRepository) : AuthService 
             .claim("permissions", user.role.permissions.map { it.name })
             .claim("email", user.email)
             .setIssuedAt(Date())
-            .setExpiration(Date(System.currentTimeMillis() + 86400000))
+            .setExpiration(Date(System.currentTimeMillis() + 86400000)) // 1 day
             .signWith(SignatureAlgorithm.HS512, secretKey)
             .compact()
     }
@@ -110,23 +112,20 @@ class AuthServiceImpl(private val userRepository: UserRepository) : AuthService 
     }
 
     private fun hashPassword(password: String): String {
-
-        return password
+        // Implement your password hashing logic here
+        return password // Placeholder
     }
 
     fun verifyPassword(inputPassword: String, storedPassword: String): Boolean {
-
         return inputPassword == storedPassword
     }
 
     override fun changePassword(email: String, request: ChangePasswordRequest): String {
         val user = userRepository.findByEmail(email) ?: throw Exception("User not found")
 
-
         if (!verifyPassword(request.currentPassword, user.password)) {
             throw Exception("Current password is incorrect")
         }
-
 
         user.password = hashPassword(request.newPassword)
         userRepository.save(user)
