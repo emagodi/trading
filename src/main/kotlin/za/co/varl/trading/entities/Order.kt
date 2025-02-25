@@ -8,7 +8,7 @@ data class Order(
     val id: String,
     val side: Side, // "BUY" or "SELL"
     var quantity: Double,
-    val price: Double,
+    var price: Double,
     val pair: String,
     val customerOrderId: String?,
     val timeInForce: TimeInForce, // e.g., "GTC", "FOK", "IOC"
