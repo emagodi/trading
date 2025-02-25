@@ -1,7 +1,6 @@
 package za.co.varl.trading
 
 import io.jsonwebtoken.MalformedJwtException
-import io.jsonwebtoken.SignatureException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import za.co.varl.trading.config.JwtUtil
