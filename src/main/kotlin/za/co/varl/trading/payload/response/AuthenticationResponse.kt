@@ -5,7 +5,7 @@ import za.co.varl.trading.enums.Role
 data class AuthenticationResponse(
     val message: String,
     val token: String?,
-    val id: Long,  // Ensure the field is present
+    val id: Long,
     val firstName: String,
     val lastName: String,
     val dateOfBirth: String,

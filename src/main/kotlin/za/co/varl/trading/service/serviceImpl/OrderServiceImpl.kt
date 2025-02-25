@@ -126,7 +126,7 @@ class OrderServiceImpl(
 
         // Apply modifications
         request.newRemainingQuantity?.let {
-            existingOrder.quantity = it // Update remaining quantity directly
+            existingOrder.quantity = it
         }
 
         // Calculate filled quantity after updating newRemainingQuantity
@@ -147,12 +147,12 @@ class OrderServiceImpl(
             existingOrder.price = it // Update price
         }
 
-        // Save the modified order
+
         orderRepository.save(existingOrder)
 
-        // Log modification
+
         logger.info("Order modified: $existingOrder")
-        return existingOrder // Return the modified order
+        return existingOrder
     }
 
 }
