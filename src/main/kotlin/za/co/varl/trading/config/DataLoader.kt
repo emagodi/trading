@@ -20,22 +20,18 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 @Component
-class DataLoader : CommandLineRunner {
-
-    @Autowired
-    private lateinit var userRepository: UserRepository
-
-    @Autowired
-    private lateinit var orderRepository: OrderRepository
-
-    @Autowired
-    private lateinit var orderService: OrderService
+class DataLoader(
+    @Autowired private val userRepository: UserRepository,
+    @Autowired private val orderRepository: OrderRepository,
+    @Autowired private val orderService: OrderService,
+    @Autowired private val testDataProperties: TestDataProperties
+) : CommandLineRunner {
 
     private val faker = Faker()
 
     override fun run(vararg args: String?) {
-        createTestUsers(100)
-        createTestOrders(100)
+        createTestUsers(testDataProperties.userCount)
+        createTestOrders(testDataProperties.orderCount)
     }
 
     private fun createTestUsers(count: Int) {
@@ -51,7 +47,7 @@ class DataLoader : CommandLineRunner {
                 identityIssuingCountry = faker.address().country(),
                 identityType = "Passport",
                 identityNumber = faker.idNumber().valid(),
-                identityExpiryDate = faker.date().future(10 * 365, TimeUnit.DAYS).toString(), // 10 years in days
+                identityExpiryDate = faker.date().future(10 * 365, TimeUnit.DAYS).toString(),
                 cellNumber = faker.phoneNumber().cellPhone(),
                 email = faker.internet().emailAddress(),
                 purpose = Purpose.TRADING,
@@ -59,7 +55,7 @@ class DataLoader : CommandLineRunner {
                 sourceOfFunds = SourceOfFunds.ALLOWANCE
             )
             userRepository.save(user)
-            println("Test users created: ${user.email}")
+            println("Test user created: ${user.email}")
         }
     }
 
@@ -81,10 +77,8 @@ class DataLoader : CommandLineRunner {
                 status = OrderStatus.PLACED
             )
 
-
             orderRepository.save(order)
-            println("Test orders created: ${order.id} with status: ${order.status}, side: ${order.side}, price: $price, quantity: $quantity")
-
+            println("Test order created: ${order.id} with status: ${order.status}, side: ${order.side}, price: $price, quantity: $quantity")
 
             orderService.matchOrders(order.pair)
         }
