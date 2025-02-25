@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.*
 import za.co.varl.trading.entities.Order
 import za.co.varl.trading.entities.Trade
@@ -74,16 +75,15 @@ class OrderServiceImplTest {
     }
 
     @Test
-    fun `test getOrderById returns null when order not found`() {
+    fun `test getOrderById throws exception when order not found`() {
         // Arrange
         val orderId = UUID.randomUUID().toString()
         whenever(orderRepository.findById(orderId)).thenReturn(null)
 
-        // Act
-        val actualOrder = orderService.getOrderById(orderId)
-
-        // Assert
-        assertNull(actualOrder)
+        // Act & Assert
+        assertThrows<IllegalArgumentException> {
+            orderService.getOrderById(orderId)
+        }
     }
 
     @Test
