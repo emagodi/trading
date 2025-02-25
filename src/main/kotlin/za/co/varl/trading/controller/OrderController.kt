@@ -15,6 +15,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import za.co.varl.trading.config.JwtUtil
 import za.co.varl.trading.entities.Trade
+import za.co.varl.trading.payload.request.UpdateOrderRequest
 
 class OrderController(
     private val orderService: OrderService,
@@ -37,6 +38,7 @@ class OrderController(
         router.get("/:pair/tradehistory").handler(this::authenticate).handler(this::getRecentTrades)
         router.get("/:pair/openorders").handler(this::authenticate).handler(this::getOpenOrders) // Restricted to ADMIN
         router.get("/customerOrderId/:customerOrderId/openorders").handler(this::authenticate).handler(this::getOpenOrdersByCustomerId)
+        router.put("/api/orders/modify/:id").handler(this::authenticate).handler(this::modifyOrder)
     }
 
     private fun authenticate(ctx: RoutingContext) {
@@ -192,4 +194,42 @@ class OrderController(
             ctx.response().setStatusCode(404).end("No open orders found for the specified customer order ID.")
         }
     }
+
+
+
+    private fun modifyOrder(ctx: RoutingContext) {
+        val orderId = ctx.pathParam("id")
+        val permissions = ctx.get<List<String>>("permissions")
+
+        if (!permissions.contains("TRADE")) {
+            ctx.response().setStatusCode(403).end("Access denied: You do not have permission to modify orders.")
+            return
+        }
+
+        // Rate limiting
+        val email = ctx.get<String>("email") ?: return
+        if (rateLimitService.isRateLimited(email)) {
+            ctx.response().setStatusCode(429).end("Too Many Requests")
+            return
+        }
+
+        try {
+            val request = ctx.body().asJsonObject().mapTo(UpdateOrderRequest::class.java)
+            val updatedOrder = orderService.modifyOrder(orderId, request)
+
+            if (updatedOrder != null) {
+                ctx.response()
+                    .setStatusCode(202)
+                    .end(objectMapper.writeValueAsString(updatedOrder))
+            } else {
+                ctx.response().setStatusCode(404).end("Order not found or modification failed")
+            }
+        } catch (e: Exception) {
+            ctx.response()
+                .setStatusCode(400) // Bad Request
+                .putHeader("Content-Type", "application/json")
+                .end(objectMapper.writeValueAsString(mapOf("error" to e.message)))
+        }
+    }
+
 }
