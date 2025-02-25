@@ -17,7 +17,7 @@ class EmailService(private val mailSender: JavaMailSender, private val vertx: Ve
             try {
                 val mailMessage = SimpleMailMessage().apply {
                     setTo(email)
-                    subject = "Order Created"
+                    subject = "VARL Order Created"
                     text = orderDetails
                 }
 
