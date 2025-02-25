@@ -8,8 +8,8 @@ import za.co.varl.trading.service.RateLimitService
 @Component
 class RateLimitResetScheduler(private val rateLimitService: RateLimitService) {
 
-    @Scheduled(fixedRate = 60000) // Every minute
+    @Scheduled(fixedRate = 60000)
     fun reset() {
-        rateLimitService.resetAllCounts() // Reset all users' rate limits
+        rateLimitService.resetAllCounts()
     }
 }
