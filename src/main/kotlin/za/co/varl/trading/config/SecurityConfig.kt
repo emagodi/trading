@@ -10,17 +10,17 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true) // Enable method security
+@EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .csrf { csrf -> csrf.disable() } // Disable CSRF protection (consider enabling it for production)
+            .csrf { csrf -> csrf.disable() }
             .authorizeHttpRequests { requests ->
                 requests
                     .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/users", "/api/auth/changepassword").permitAll() // Allow access to register and login
-                    .anyRequest().authenticated() // Require authentication for all other requests
+                    .anyRequest().authenticated()
             }
 
 
