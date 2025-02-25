@@ -24,6 +24,9 @@ class OrderServiceImpl(
     private val logger = LoggerFactory.getLogger(OrderServiceImpl::class.java)
 
     override fun createLimitOrder(request: CreateOrderRequest): Order {
+        // Validate request
+        validateCreateOrderRequest(request)
+
         val newOrder = Order(
             id = UUID.randomUUID().toString(),
             side = request.side,
@@ -41,7 +44,7 @@ class OrderServiceImpl(
     }
 
     override fun getOrderById(id: String): Order? {
-        return orderRepository.findById(id)
+        return orderRepository.findById(id) ?: throw IllegalArgumentException("Order not found with id: $id")
     }
 
     override fun getAllOrders(): List<Order> {
@@ -119,27 +122,26 @@ class OrderServiceImpl(
         return orderRepository.findOpenOrdersByCustomerId(customerOrderId)
     }
 
-
-
     override fun modifyOrder(orderId: String, request: UpdateOrderRequest): Order? {
-        val existingOrder = orderRepository.findById(orderId) ?: return null
+        val existingOrder = orderRepository.findById(orderId) ?: throw IllegalArgumentException("Order not found with id: $orderId")
 
-        // Apply modifications
-        request.newRemainingQuantity?.let {
-            existingOrder.quantity = it
+        // Apply modifications and validate
+        validateUpdateOrderRequest(request)
+
+        request.newRemainingQuantity?.let { newQuantity ->
+            existingOrder.quantity = newQuantity
         }
 
         // Calculate filled quantity after updating newRemainingQuantity
         val filledQuantity = existingOrder.quantity - (request.newRemainingQuantity ?: 0.0)
 
-        request.newTotalQuantity?.let {
-            // Check if the new total quantity can be set
-            if (it < filledQuantity) {
-                // Cancel order if new total quantity is less than filled
+        request.newTotalQuantity?.let { newTotalQuantity ->
+            if (newTotalQuantity < filledQuantity) {
                 orderRepository.deleteById(orderId)
+                logger.info("Order $orderId cancelled due to invalid new total quantity.")
                 return null
             } else {
-                existingOrder.quantity = it // Update total quantity if valid
+                existingOrder.quantity = newTotalQuantity // Update total quantity if valid
             }
         }
 
@@ -147,12 +149,26 @@ class OrderServiceImpl(
             existingOrder.price = it // Update price
         }
 
-
         orderRepository.save(existingOrder)
-
 
         logger.info("Order modified: $existingOrder")
         return existingOrder
     }
 
+    private fun validateCreateOrderRequest(request: CreateOrderRequest) {
+        require(request.quantity > 0) { "Quantity must be greater than zero." }
+        require(request.price > 0) { "Price must be greater than zero." }
+    }
+
+    private fun validateUpdateOrderRequest(request: UpdateOrderRequest) {
+        request.newRemainingQuantity?.let {
+            require(it >= 0) { "New remaining quantity cannot be negative." }
+        }
+        request.newTotalQuantity?.let {
+            require(it > 0) { "New total quantity must be greater than zero." }
+        }
+        request.newPrice?.let {
+            require(it > 0) { "New price must be greater than zero." }
+        }
+    }
 }
