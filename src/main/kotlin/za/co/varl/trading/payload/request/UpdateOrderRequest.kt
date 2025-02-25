@@ -8,5 +8,5 @@ data class UpdateOrderRequest @JsonCreator constructor(
     @JsonProperty("newTotalQuantity") val newTotalQuantity: Double? = null,
     @JsonProperty("newPrice") val newPrice: Double? = null,
     @JsonProperty("customerOrderId") val customerOrderId: String? = null,
-    @JsonProperty("modifyMatchStrategy") val modifyMatchStrategy: String // e.g., "RETAIN_ORIGINAL", "CANCEL_ORIGINAL", "REPRICE"
+    @JsonProperty("modifyMatchStrategy") val modifyMatchStrategy: String
 )
