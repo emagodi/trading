@@ -47,7 +47,7 @@ class TradingApplication {
 		router.route().handler(BodyHandler.create())
 
 		// Set up the AuthController routes
-		val authController = AuthController(authService, jwtUtil)
+		val authController = AuthController(authService)
 		authController.setupRoutes(router)
 
 		// Set up the OrderController routes, passing emailService
