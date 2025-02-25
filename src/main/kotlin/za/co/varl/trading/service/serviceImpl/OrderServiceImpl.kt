@@ -126,28 +126,33 @@ class OrderServiceImpl(
 
         // Apply modifications
         request.newRemainingQuantity?.let {
-            existingOrder.quantity = it // Update quantity
+            existingOrder.quantity = it // Update remaining quantity directly
         }
+
+        // Calculate filled quantity after updating newRemainingQuantity
+        val filledQuantity = existingOrder.quantity - (request.newRemainingQuantity ?: 0.0)
+
         request.newTotalQuantity?.let {
-            if (it < (existingOrder.quantity - (existingOrder.quantity - it))) {
+            // Check if the new total quantity can be set
+            if (it < filledQuantity) {
                 // Cancel order if new total quantity is less than filled
                 orderRepository.deleteById(orderId)
                 return null
             } else {
-                existingOrder.quantity = it // Update total quantity
+                existingOrder.quantity = it // Update total quantity if valid
             }
         }
+
         request.newPrice?.let {
             existingOrder.price = it // Update price
         }
 
-        // Update status if necessary
+        // Save the modified order
         orderRepository.save(existingOrder)
 
         // Log modification
         logger.info("Order modified: $existingOrder")
-        return existingOrder
+        return existingOrder // Return the modified order
     }
-
 
 }
