@@ -51,7 +51,7 @@ class TradingApplication {
 		authController.setupRoutes(router)
 
 		// Set up the OrderController routes, passing emailService
-		val orderController = OrderController(orderService, vertx, jwtUtil, rateLimitService, emailService)
+		val orderController = OrderController(orderService, jwtUtil, rateLimitService, emailService)
 		orderController.setupRoutes(router)
 
 		// Start the Vert.x HTTP server

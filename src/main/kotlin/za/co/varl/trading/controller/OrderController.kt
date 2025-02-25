@@ -1,6 +1,5 @@
 package za.co.varl.trading.controller
 
-import io.vertx.core.Vertx
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.RoutingContext
@@ -19,7 +18,6 @@ import za.co.varl.trading.payload.request.UpdateOrderRequest
 
 class OrderController(
     private val orderService: OrderService,
-    private val vertx: Vertx,
     private val jwtUtil: JwtUtil,
     private val rateLimitService: RateLimitService,
     private val emailService: EmailService
