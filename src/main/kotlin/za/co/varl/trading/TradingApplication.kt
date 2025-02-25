@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.cache.CacheManager
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
+import org.springframework.beans.factory.annotation.Value
 import za.co.varl.trading.config.JwtUtil
 import za.co.varl.trading.controller.AuthController
 import za.co.varl.trading.controller.OrderController
@@ -20,6 +21,9 @@ import za.co.varl.trading.service.EmailService
 @SpringBootApplication
 @EnableCaching // Enable caching in the Spring application
 class TradingApplication {
+
+	@Value("\${jwt.secret}")
+	lateinit var jwtSecret: String // Inject the JWT secret from properties
 
 	@Bean
 	fun vertx(): Vertx {
@@ -36,8 +40,8 @@ class TradingApplication {
 		val vertx = vertx() // Get the Vertx instance
 		val router = Router.router(vertx)
 
-		// Create an instance of JwtUtil
-		val jwtUtil = JwtUtil("586B633834416E396D7436753879382F423F4428482B4C6250655367566B5970")
+		// Create an instance of JwtUtil using the injected secret
+		val jwtUtil = JwtUtil(jwtSecret)
 
 		// Add BodyHandler to parse the body of incoming requests
 		router.route().handler(BodyHandler.create())
