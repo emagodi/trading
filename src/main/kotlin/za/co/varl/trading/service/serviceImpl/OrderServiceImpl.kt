@@ -10,6 +10,7 @@ import za.co.varl.trading.payload.request.CreateOrderRequest
 import za.co.varl.trading.repository.OrderRepository
 import za.co.varl.trading.service.OrderService
 import za.co.varl.trading.enums.OrderStatus
+import za.co.varl.trading.payload.request.UpdateOrderRequest
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -117,4 +118,36 @@ class OrderServiceImpl(
     override fun getOpenOrdersByCustomerId(customerOrderId: String): List<Order> {
         return orderRepository.findOpenOrdersByCustomerId(customerOrderId)
     }
+
+
+
+    override fun modifyOrder(orderId: String, request: UpdateOrderRequest): Order? {
+        val existingOrder = orderRepository.findById(orderId) ?: return null
+
+        // Apply modifications
+        request.newRemainingQuantity?.let {
+            existingOrder.quantity = it // Update quantity
+        }
+        request.newTotalQuantity?.let {
+            if (it < (existingOrder.quantity - (existingOrder.quantity - it))) {
+                // Cancel order if new total quantity is less than filled
+                orderRepository.deleteById(orderId)
+                return null
+            } else {
+                existingOrder.quantity = it // Update total quantity
+            }
+        }
+        request.newPrice?.let {
+            existingOrder.price = it // Update price
+        }
+
+        // Update status if necessary
+        orderRepository.save(existingOrder)
+
+        // Log modification
+        logger.info("Order modified: $existingOrder")
+        return existingOrder
+    }
+
+
 }
