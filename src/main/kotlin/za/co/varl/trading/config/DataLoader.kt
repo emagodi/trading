@@ -15,7 +15,7 @@ import za.co.varl.trading.repository.UserRepository
 import za.co.varl.trading.enums.EmploymentStatus
 import za.co.varl.trading.enums.Purpose
 import za.co.varl.trading.enums.SourceOfFunds
-import za.co.varl.trading.service.OrderService // Import the OrderService
+import za.co.varl.trading.service.OrderService
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -29,13 +29,13 @@ class DataLoader : CommandLineRunner {
     private lateinit var orderRepository: OrderRepository
 
     @Autowired
-    private lateinit var orderService: OrderService // Inject the OrderService
+    private lateinit var orderService: OrderService
 
     private val faker = Faker()
 
     override fun run(vararg args: String?) {
-        createTestUsers(100)  // Create 100 test users
-        createTestOrders(100) // Create 100 test orders
+        createTestUsers(100)
+        createTestOrders(100)
     }
 
     private fun createTestUsers(count: Int) {
@@ -67,7 +67,7 @@ class DataLoader : CommandLineRunner {
         val priceRange = 1000.0..10000.0
 
         for (i in 1..count) {
-            val side = if (i % 2 == 0) Side.BUY else Side.SELL // Alternate between BUY and SELL
+            val side = if (i % 2 == 0) Side.BUY else Side.SELL
             val price = faker.number().randomDouble(2, priceRange.start.toInt(), priceRange.endInclusive.toInt())
             val quantity = faker.number().randomDouble(2, 1, 100)
             val order = Order(
@@ -81,11 +81,11 @@ class DataLoader : CommandLineRunner {
                 status = OrderStatus.PLACED
             )
 
-            // Save the order
+
             orderRepository.save(order)
             println("Test orders created: ${order.id} with status: ${order.status}, side: ${order.side}, price: $price, quantity: $quantity")
 
-            // Call the matching logic after each new order is created
+
             orderService.matchOrders(order.pair)
         }
     }
