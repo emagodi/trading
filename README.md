@@ -80,7 +80,14 @@ The VARL Trading Application is a robust application built with Spring Boot vers
 - **Get Open Orders by Customer ID**:
     - `GET http://localhost:8080/customerOrderId/:customerOrderId/openorders`
 - **Modify Order**:
-    - `GET http://localhost:8080/api/orders/modify/:id`
+    - `PUT http://localhost:8080/api/orders/modify/:id`
+    - {
+      "newRemainingQuantity": 150.0,
+      "newTotalQuantity": null,
+      "newPrice": 150.00,
+      "customerOrderId": "10",
+      "modifyMatchStrategy": "RETAIN_ORIGINAL"
+      }
 
 ## Getting Started
 
@@ -101,7 +108,8 @@ The VARL Trading Application is a robust application built with Spring Boot vers
 2. Build the project:
     ```bash
     mvn clean package
-    docker-compose up --build
+    docker compose build
+    docker compose up
 
 ### DataLoader
 - JavaFaker
