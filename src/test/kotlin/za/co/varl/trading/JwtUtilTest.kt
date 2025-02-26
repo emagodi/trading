@@ -80,7 +80,7 @@ class JwtUtilTest {
         val token = jwtUtil.generateToken("testUser", Role.USER, "test@example.com")
         // Tamper with the token to simulate an exception
         val tamperedToken = token.substring(0, token.length - 1) + "x"
-        assertFalse(jwtUtil.validateToken(tamperedToken))
+        assertFalse(jwtUtil.validateToken(tamperedToken)) // Ensure it returns false
     }
 
     @Test
