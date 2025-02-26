@@ -77,7 +77,7 @@ class OrderServiceImpl(
 
         for (buyOrder in buyOrders) {
             for (sellOrder in sellOrders) {
-                logger.info("Attempting to match: BUY(${buyOrder.id}, ${buyOrder.quantity}, ${buyOrder.price}) with SELL(${sellOrder.id}, ${sellOrder.quantity}, ${sellOrder.price})")
+               // logger.info("Attempting to match: BUY(${buyOrder.id}, ${buyOrder.quantity}, ${buyOrder.price}) with SELL(${sellOrder.id}, ${sellOrder.quantity}, ${sellOrder.price})")
 
                 if (buyOrder.price >= sellOrder.price && buyOrder.quantity > 0 && sellOrder.quantity > 0) {
                     val quantityMatched = minOf(buyOrder.quantity, sellOrder.quantity)
@@ -101,7 +101,7 @@ class OrderServiceImpl(
                     updateOrderStatus(buyOrder, newBuyQuantity)
                     updateOrderStatus(sellOrder, newSellQuantity)
 
-                    logger.info("Matched $quantityMatched of ${buyOrder.id} with ${sellOrder.id}")
+                  //  logger.info("Matched $quantityMatched of ${buyOrder.id} with ${sellOrder.id}")
 
                     if (newBuyQuantity <= 0) break
                 }
