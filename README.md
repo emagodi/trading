@@ -88,6 +88,8 @@ The VARL Trading Application is a robust application built with Spring Boot vers
       "customerOrderId": "10",
       "modifyMatchStrategy": "RETAIN_ORIGINAL"
       }
+- **Get All Orders by Customer ID**:
+    - `GET http://localhost:8080/customerOrderId/:customerOrderId/allorders`
 
 ## Getting Started
 
