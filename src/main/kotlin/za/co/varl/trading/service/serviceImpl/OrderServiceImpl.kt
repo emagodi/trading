@@ -171,4 +171,11 @@ class OrderServiceImpl(
             require(it > 0) { "New price must be greater than zero." }
         }
     }
+
+
+    override fun getAllOrdersByCustomerId(customerOrderId: String): List<Order> {
+        return orderRepository.findAllOrdersByCustomerId(customerOrderId)
+    }
+
+
 }
