@@ -55,7 +55,7 @@ class DataLoader(
                 sourceOfFunds = SourceOfFunds.ALLOWANCE
             )
             userRepository.save(user)
-            println("Test user created: ${user.email}")
+           // println("Test user created: ${user.email}")
         }
     }
 
@@ -78,7 +78,7 @@ class DataLoader(
             )
 
             orderRepository.save(order)
-            println("Test order created: ${order.id} with status: ${order.status}, side: ${order.side}, price: $price, quantity: $quantity")
+           // println("Test order created: ${order.id} with status: ${order.status}, side: ${order.side}, price: $price, quantity: $quantity")
 
             orderService.matchOrders(order.pair)
         }
