@@ -50,7 +50,7 @@ class TradingApplication {
 		val authController = AuthController(authService)
 		authController.setupRoutes(router)
 
-		// Set up the OrderController routes, passing emailService
+		// Set up the OrderController routes
 		val orderController = OrderController(orderService, jwtUtil, rateLimitService, emailService)
 		orderController.setupRoutes(router)
 
@@ -64,6 +64,7 @@ class TradingApplication {
 					println("Failed to bind Vert.x server: ${result.cause()}")
 				}
 			}
+
 		return router
 	}
 
@@ -71,6 +72,7 @@ class TradingApplication {
 	fun cacheManager(): CacheManager {
 		return ConcurrentMapCacheManager("orders", "trades") // Define your cache names here
 	}
+
 }
 
 fun main(args: Array<String>) {
