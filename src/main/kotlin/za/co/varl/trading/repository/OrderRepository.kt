@@ -80,4 +80,12 @@ class OrderRepository {
                 (it.status == OrderStatus.PLACED || it.status == OrderStatus.ACTIVE || it.status == OrderStatus.PARTIALLY_FILLED) }
     }
 
+    fun findAllOrdersByCustomerId(customerOrderId: String): List<Order> {
+        return orders.values.filter { it.customerOrderId == customerOrderId &&
+                (it.status == OrderStatus.PLACED || it.status == OrderStatus.ACTIVE || it.status == OrderStatus.PARTIALLY_FILLED || it.status == OrderStatus.FILLED || it.status == OrderStatus.CANCELLED) }
+    }
+
+
+
+
 }
