@@ -37,6 +37,8 @@ class OrderController(
         router.get("/:pair/openorders").handler(this::authenticate).handler(this::getOpenOrders)
         router.get("/customerOrderId/:customerOrderId/openorders").handler(this::authenticate).handler(this::getOpenOrdersByCustomerId)
         router.put("/api/orders/modify/:id").handler(this::authenticate).handler(this::modifyOrder)
+
+        router.get("/customerOrderId/:customerOrderId/allorders").handler(this::authenticate).handler(this::getAllOrdersByCustomerId)
     }
 
     private fun authenticate(ctx: RoutingContext) {
@@ -227,6 +229,21 @@ class OrderController(
                 .setStatusCode(400)
                 .putHeader("Content-Type", "application/json")
                 .end(objectMapper.writeValueAsString(mapOf("error" to e.message)))
+        }
+    }
+
+
+    private fun getAllOrdersByCustomerId(ctx: RoutingContext) {
+        val customerOrderId = ctx.pathParam("customerOrderId")
+        val openOrders: List<Order> = orderService.getAllOrdersByCustomerId(customerOrderId)
+
+        if (openOrders.isNotEmpty()) {
+            ctx.response()
+                .setStatusCode(200)
+                .putHeader("Cache-Control", "max-age=60, public")
+                .end(objectMapper.writeValueAsString(openOrders))
+        } else {
+            ctx.response().setStatusCode(404).end("No open orders found for the specified customer order ID.")
         }
     }
 
