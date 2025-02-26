@@ -17,7 +17,7 @@ import java.util.Date
 class AuthServiceImpl(private val userRepository: UserRepository) : AuthService {
 
     @Value("\${jwt.secret}")
-    private lateinit var secretKey: String
+    lateinit var secretKey: String
 
     override fun registerUser(request: RegisterRequest): AuthenticationResponse {
         if (userRepository.existsByEmail(request.email)) {
@@ -111,7 +111,7 @@ class AuthServiceImpl(private val userRepository: UserRepository) : AuthService 
         return userRepository.getAllUsers().size.toLong() + 1
     }
 
-    private fun hashPassword(password: String): String {
+    fun hashPassword(password: String): String {
         // Implement your password hashing logic here
         return password // Placeholder
     }
