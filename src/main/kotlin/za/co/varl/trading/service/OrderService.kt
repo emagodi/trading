@@ -16,4 +16,6 @@ interface OrderService {
     fun getOpenOrders(pair: String): List<Order>
     fun getOpenOrdersByCustomerId(customerOrderId: String): List<Order>
     fun modifyOrder(orderId: String, request: UpdateOrderRequest): Order?
+
+    fun getAllOrdersByCustomerId(customerOrderId: String): List<Order>
 }
