@@ -1,5 +1,6 @@
 package za.co.varl.trading
 
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -17,7 +18,7 @@ import za.co.varl.trading.service.serviceImpl.AuthServiceImpl
 class AuthServiceImplTest {
 
     private val userRepository: UserRepository = mock()
-    private val authService = AuthServiceImpl(userRepository)
+    private lateinit var authService: AuthServiceImpl
 
     private val registerRequest = RegisterRequest(
         firstName = "Edwin",
@@ -36,6 +37,15 @@ class AuthServiceImplTest {
         sourceOfFunds = SourceOfFunds.ALLOWANCE,
         role = Role.USER
     )
+
+    @BeforeEach
+    fun setUp() {
+        // Initialize AuthServiceImpl with the mocked UserRepository and a secret key
+        val secretKeyValue = "your-secret-key" // Replace with your actual secret key
+        authService = AuthServiceImpl(userRepository).apply {
+            this.secretKey = secretKeyValue // Directly assign the secret key for testing
+        }
+    }
 
     @Test
     fun `test registerUser successfully registers a new user`() {
@@ -103,10 +113,12 @@ class AuthServiceImplTest {
     @Test
     fun `test authenticateUser successfully logs in a user`() {
         // Arrange
+        val hashedPassword = authService.hashPassword("Password@123") // Hash the password
+
         val user = User(
             id = 1L,
             email = registerRequest.email,
-            password = "Password@123", // This should match the password used in the verifyPassword method
+            password = hashedPassword, // Set the hashed password
             role = registerRequest.role,
             firstName = registerRequest.firstName,
             lastName = registerRequest.lastName,
